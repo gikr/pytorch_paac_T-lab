@@ -17,8 +17,8 @@ def model_evaluation(eval_function):
     return wrapper
 
 @model_evaluation
-def stats_eval(len_int_paac, network, batch_emulator, greedy=False, num_episodes=None):
-    #len_int_paac = [10,10]
+def stats_eval(network, batch_emulator, greedy=False, num_episodes=None):
+    len_int_paac = [10,10]
     """
     Runs play with the network for num_episodes episodes.
     Returns:
@@ -108,7 +108,7 @@ def visual_eval(network, env_creator, greedy=False, num_episodes=1, verbose=0, d
             total_r = 0
 
             for t in itertools.count():
-                acts, rnn_state = choose_action(network, states, infos, mask, rnn_state, greedy)
+                acts, rnn_state = choose_action([10,10], network, states, infos, mask, rnn_state, greedy)
                 act = acts[0].item()
 
                 states, reward, is_done, infos = unsqueeze(emulator.next(act))

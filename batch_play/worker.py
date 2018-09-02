@@ -46,6 +46,7 @@ class WorkerProcess(Process):
         If it gets some unknown command WorkerError is raised and the process is terminated.
         """
         emulators = self.create_emulators()
+        print(emulators, 'emulatros')
         try:
             while True:
                 command = self.queue.get()
@@ -61,15 +62,26 @@ class WorkerProcess(Process):
                         for k in self.info:
                             self.info[k][i] = info[k]
                     self.barrier.put(True)
-                elif command == self.Command.RESET:
 
+                elif command == self.Command.RESET:
                     for i, emulator in enumerate(emulators):
+                        print(command, type(emulator))
+                        #print(emulator)
                         self.state[i], info = emulator.reset()
                         for k in self.info:
                             self.info[k][i] = info[k]
                     self.barrier.put(True)
+
+
+                elif (type(command) == list):  # and len(command) == 2:
+                    for i, emulator in enumerate(emulators):
+                        print(command[i], 'length')
+                        emulator.set_length(command[i])
+                    self.barrier.put(True)
+
                 elif command == self.Command.CLOSE:
                     break
+
                 else:
                     raise WorkerError("{} has received unknown command {}".format(type(self),command))
         finally:

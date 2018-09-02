@@ -118,9 +118,7 @@ class ParallelActorCritic(object):
         num_emulators = self.batch_env.num_emulators
         total_episode_rewards = np.zeros(num_emulators)
 
-        if self.evaluate is not None:
-            stats = self.evaluate(self.checking_length, self.network)
-            training_stats.append((self.global_step, stats))
+
 
         #stores 0.0 in i-th element if the episode in i-th emulator has just started, otherwise stores 1.0
         #mask is used to cut rnn_state and episode rewards between episodes.
@@ -131,6 +129,10 @@ class ParallelActorCritic(object):
 
         states, infos = self.batch_env.reset_all()
         self.batch_env.set_difficulty(self.starting_length)
+
+        if self.evaluate is not None:
+            stats = self.evaluate(self.network)
+            training_stats.append((self.global_step, stats))
 
         start_time = time.time()
         while self.global_step < self.total_steps:

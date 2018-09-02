@@ -62,12 +62,11 @@ def concurrent_emulator_handler(batch_env):
 TrainingStats = namedtuple("TrainingStats", ['mean_r', 'max_r', 'min_r', 'std_r', 'mean_steps'])
 
 
-def eval_network(len_int, network, env_creator, num_episodes, greedy=False, verbose=True):
-    #len_int = [10,10]
-    self.len_int = len_int
+def eval_network(network, env_creator, num_episodes, greedy=False, verbose=True):
+    len_int = [10,10]
     emulator = SequentialBatchEmulator(env_creator, num_episodes, False)
     try:
-        num_steps, rewards, final_res = evaluate.stats_eval(self.len_int, network, emulator, greedy=greedy)
+        num_steps, rewards, final_res = evaluate.stats_eval(network, emulator, greedy=greedy)
     finally:
         emulator.close()
         set_exit_handler()
@@ -99,10 +98,10 @@ def main(args):
     batch_env = ConcurrentBatchEmulator(WorkerProcess, env_creator, args.num_workers, args.num_envs)
     set_exit_handler(concurrent_emulator_handler(batch_env))
     try:
-        batch_env.start_workers()
+        #batch_env.start_workers()
         learner = ParallelActorCritic(network, batch_env, args)
         # evaluation results are saved as summaries of the training process:
-        learner.evaluate = lambda network: eval_network(len_int, network, env_creator,  num_episodes=10)
+        learner.evaluate = lambda network: eval_network(network, env_creator,  num_episodes=10)
         learner.train()
     finally:
         batch_env.close()
